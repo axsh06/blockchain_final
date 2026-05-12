@@ -29,7 +29,7 @@ jobs:
         run: forge test -vvv
 
       - name: Run Forge Coverage
-        run: forge coverage --report lcov
+        run: forge coverage --report summary
 
       - name: Run Slither
         uses: crytic/slither-action@v0.3.0
