@@ -21,7 +21,39 @@ contract AMMPair is ERC20, ReentrancyGuard {
         token1 = IERC20(_token1);
     }
 
-    // Функция обмена (Swap) с комиссией 0.3% и защитой от проскальзывания (minAmountOut)
+    function addLiquidity(uint256 amount0, uint256 amount1) external nonReentrant returns (uint256 liquidity) {
+        token0.safeTransferFrom(msg.sender, address(this), amount0);
+        token1.safeTransferFrom(msg.sender, address(this), amount1);
+
+        uint256 _totalSupply = totalSupply();
+        if (_totalSupply == 0) {
+            liquidity = Math.sqrt(amount0 * amount1);
+        } else {
+            liquidity = Math.min(
+                (amount0 * _totalSupply) / reserve0,
+                (amount1 * _totalSupply) / reserve1
+            );
+        }
+
+        require(liquidity > 0, "Insufficient liquidity minted");
+        _mint(msg.sender, liquidity);
+        _update(token0.balanceOf(address(this)), token1.balanceOf(address(this)));
+    }
+
+    function removeLiquidity(uint256 liquidity) external nonReentrant returns (uint256 amount0, uint256 amount1) {
+        uint256 _totalSupply = totalSupply();
+        amount0 = (liquidity * reserve0) / _totalSupply;
+        amount1 = (liquidity * reserve1) / _totalSupply;
+
+        require(amount0 > 0 && amount1 > 0, "Insufficient liquidity burned");
+        _burn(msg.sender, liquidity);
+
+        token0.safeTransfer(msg.sender, amount0);
+        token1.safeTransfer(msg.sender, amount1);
+        
+        _update(token0.balanceOf(address(this)), token1.balanceOf(address(this)));
+    }
+
     function swap(address tokenIn, uint256 amountIn, uint256 minAmountOut) external nonReentrant returns (uint256 amountOut) {
         require(tokenIn == address(token0) || tokenIn == address(token1), "Invalid token");
         require(amountIn > 0, "Zero amount");
@@ -31,11 +63,8 @@ contract AMMPair is ERC20, ReentrancyGuard {
             ? (token0, token1, reserve0, reserve1)
             : (token1, token0, reserve1, reserve0);
 
-        // Расчет по формуле постоянного произведения (x * y = k) с комиссией 0.3%
         uint256 amountInWithFee = amountIn * 997;
         amountOut = (reserveOut * amountInWithFee) / ((reserveIn * 1000) + amountInWithFee);
-
-        // Защита от проскальзывания (Slippage protection)
         require(amountOut >= minAmountOut, "Slippage protection triggered");
 
         tokenInContract.safeTransferFrom(msg.sender, address(this), amountIn);
