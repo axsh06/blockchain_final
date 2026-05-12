@@ -23,7 +23,7 @@ contract AMMFactoryTest is Test {
 
     function test_CreatePair() public {
         address pair = factory.createPair(address(tokenA), address(tokenB));
-        
+
         assertEq(factory.allPairsLength(), 1);
         assertEq(factory.getPair(address(tokenA), address(tokenB)), pair);
         assertTrue(pair != address(0));
@@ -32,7 +32,7 @@ contract AMMFactoryTest is Test {
     function test_CreatePairDeterministic() public {
         bytes32 salt = keccak256(abi.encodePacked("salt123"));
         address pair = factory.createPairDeterministic(address(tokenA), address(tokenB), salt);
-        
+
         assertTrue(pair != address(0));
         assertEq(factory.allPairsLength(), 1);
 
