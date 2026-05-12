@@ -15,8 +15,8 @@ contract AMMFactory {
         require(token0 != address(0), "ZERO_ADDRESS");
         require(getPair[token0][token1] == address(0), "PAIR_EXISTS");
 
-        pair = address(new AMMPair());
-        
+        pair = address(new AMMPair(token0, token1));
+
         getPair[token0][token1] = pair;
         getPair[token1][token0] = pair; 
         allPairs.push(pair);
@@ -29,7 +29,7 @@ contract AMMFactory {
         (address token0, address token1) = tokenA < tokenB ? (tokenA, tokenB) : (tokenB, tokenA);
         require(getPair[token0][token1] == address(0), "PAIR_EXISTS");
 
-        pair = address(new AMMPair{salt: salt}());
+        pair = address(new AMMPair{salt: salt}(token0, token1));
 
         getPair[token0][token1] = pair;
         getPair[token1][token0] = pair;
