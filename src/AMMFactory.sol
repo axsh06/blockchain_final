@@ -7,7 +7,7 @@ contract AMMFactory {
     mapping(address => mapping(address => address)) public getPair;
     address[] public allPairs;
 
-    event PairCreated(address indexed token0, address indexed token1, address pair, uint allPairsLength);
+    event PairCreated(address indexed token0, address indexed token1, address pair, uint256 allPairsLength);
 
     function createPair(address tokenA, address tokenB) external returns (address pair) {
         require(tokenA != tokenB, "IDENTICAL_ADDRESSES");
@@ -18,9 +18,9 @@ contract AMMFactory {
         pair = address(new AMMPair(token0, token1));
 
         getPair[token0][token1] = pair;
-        getPair[token1][token0] = pair; 
+        getPair[token1][token0] = pair;
         allPairs.push(pair);
-        
+
         emit PairCreated(token0, token1, pair, allPairs.length);
     }
 
@@ -38,7 +38,7 @@ contract AMMFactory {
         emit PairCreated(token0, token1, pair, allPairs.length);
     }
 
-    function allPairsLength() external view returns (uint) {
+    function allPairsLength() external view returns (uint256) {
         return allPairs.length;
     }
 }

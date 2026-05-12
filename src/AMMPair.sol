@@ -29,10 +29,7 @@ contract AMMPair is ERC20, ReentrancyGuard {
         if (_totalSupply == 0) {
             liquidity = Math.sqrt(amount0 * amount1);
         } else {
-            liquidity = Math.min(
-                (amount0 * _totalSupply) / reserve0,
-                (amount1 * _totalSupply) / reserve1
-            );
+            liquidity = Math.min((amount0 * _totalSupply) / reserve0, (amount1 * _totalSupply) / reserve1);
         }
 
         require(liquidity > 0, "Insufficient liquidity minted");
@@ -50,18 +47,21 @@ contract AMMPair is ERC20, ReentrancyGuard {
 
         token0.safeTransfer(msg.sender, amount0);
         token1.safeTransfer(msg.sender, amount1);
-        
+
         _update(token0.balanceOf(address(this)), token1.balanceOf(address(this)));
     }
 
-    function swap(address tokenIn, uint256 amountIn, uint256 minAmountOut) external nonReentrant returns (uint256 amountOut) {
+    function swap(address tokenIn, uint256 amountIn, uint256 minAmountOut)
+        external
+        nonReentrant
+        returns (uint256 amountOut)
+    {
         require(tokenIn == address(token0) || tokenIn == address(token1), "Invalid token");
         require(amountIn > 0, "Zero amount");
 
         bool isToken0 = tokenIn == address(token0);
-        (IERC20 tokenInContract, IERC20 tokenOutContract, uint256 reserveIn, uint256 reserveOut) = isToken0
-            ? (token0, token1, reserve0, reserve1)
-            : (token1, token0, reserve1, reserve0);
+        (IERC20 tokenInContract, IERC20 tokenOutContract, uint256 reserveIn, uint256 reserveOut) =
+            isToken0 ? (token0, token1, reserve0, reserve1) : (token1, token0, reserve1, reserve0);
 
         uint256 amountInWithFee = amountIn * 997;
         amountOut = (reserveOut * amountInWithFee) / ((reserveIn * 1000) + amountInWithFee);

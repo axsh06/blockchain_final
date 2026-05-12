@@ -3,7 +3,10 @@ pragma solidity ^0.8.20;
 
 // Интерфейс для подключения к Chainlink
 interface AggregatorV3Interface {
-    function latestRoundData() external view returns (uint80 roundId, int256 answer, uint256 startedAt, uint256 updatedAt, uint80 answeredInRound);
+    function latestRoundData()
+        external
+        view
+        returns (uint80 roundId, int256 answer, uint256 startedAt, uint256 updatedAt, uint80 answeredInRound);
 }
 
 contract PriceOracle {
@@ -23,7 +26,7 @@ contract PriceOracle {
             uint256 updatedAt,
             /* uint80 answeredInRound */
         ) = priceFeed.latestRoundData();
-        
+
         // Требование безопасности: проверяем, что данные не старше 1 часа
         require(block.timestamp - updatedAt < 3600, "Oracle: Stale price data");
         require(price > 0, "Oracle: Invalid price");
