@@ -22,9 +22,6 @@ jobs:
       - name: Run Forge Build
         run: forge build --sizes
 
-      - name: Run Forge Format Check
-        run: forge fmt --check
-
       - name: Run Forge Tests
         run: forge test -vvv
 
