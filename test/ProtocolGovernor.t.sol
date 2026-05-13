@@ -46,9 +46,9 @@ contract GovernorTest is Test {
 
         bytes32 proposerRole = timelock.PROPOSER_ROLE();
         bytes32 executorRole = timelock.EXECUTOR_ROLE();
-        
+
         timelock.grantRole(proposerRole, address(governor));
-        timelock.grantRole(executorRole, address(0)); 
+        timelock.grantRole(executorRole, address(0));
 
         box = new Box(address(timelock));
     }
@@ -76,9 +76,9 @@ contract GovernorTest is Test {
         uint256 delay = governor.votingDelay();
         vm.warp(block.timestamp + delay + 1);
         vm.roll(block.number + delay + 1);
-        
+
         vm.prank(user);
-        governor.castVote(proposalId, 1); 
+        governor.castVote(proposalId, 1);
 
         // ИСПРАВЛЕНИЕ: Мотаем период голосования аналогично
         uint256 period = governor.votingPeriod();

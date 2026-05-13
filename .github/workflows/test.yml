@@ -1,0 +1,42 @@
+name: Blockchain CI
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  check:
+    name: Foundry Project
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@v1
+
+      - name: Run Forge Build
+        run: forge build --sizes
+
+      - name: Run Forge Format Check
+        run: forge fmt --check
+
+      - name: Run Forge Tests
+        run: forge test -vvv
+
+      - name: Run Forge Coverage
+        run: forge coverage --report summary
+
+      - name: Run Solhint
+        run: npx solhint 'src/**/*.sol'
+
+      - name: Run Slither 
+        uses: crytic/slither-action@v0.3.0
+        continue-on-error: true
+        with:
+          target: '.'
+          slither-args: --fail-low false

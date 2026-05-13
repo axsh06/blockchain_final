@@ -21,7 +21,6 @@ contract DeployProtocol is Script {
         GovToken govToken = new GovToken();
         
         // 2. Деплоим Timelock
-        // Сначала админом будет деплоер, чтобы правильно настроить роли
         address[] memory proposers = new address[](0);
         address[] memory executors = new address[](0);
         Timelock timelock = new Timelock(172800, proposers, executors, deployer);
@@ -34,14 +33,12 @@ contract DeployProtocol is Script {
         bytes32 executorRole = timelock.EXECUTOR_ROLE();
         bytes32 adminRole = timelock.DEFAULT_ADMIN_ROLE();
 
-        timelock.grantRole(proposerRole, address(governor)); // Только DAO может предлагать
-        timelock.grantRole(executorRole, address(0));      // Кто угодно может исполнять после задержки
-        
-        // ВАЖНО: Деплоер отказывается от прав админа. Теперь протоколом управляет только DAO
+        timelock.grantRole(proposerRole, address(governor));
+        timelock.grantRole(executorRole, address(0)); 
         timelock.revokeRole(adminRole, deployer); 
         
         // 5. Деплоим AMM и Vault
-        AMMPair amm = new AMMPair(address(govToken), address(0)); // Адрес второго токена пока 0
+        AMMPair amm = new AMMPair(address(govToken), address(0)); 
         YieldVault vault = new YieldVault(govToken);
         
         // 6. Оракул для Sepolia
