@@ -14,3 +14,4 @@ contract YieldVault is ERC4626 {
     // функции deposit, mint, withdraw и redeem, которые строго соблюдают
     // EIP-4626 rounding invariants (округление в пользу протокола).
 }
+ 
