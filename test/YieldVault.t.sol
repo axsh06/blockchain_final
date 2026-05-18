@@ -14,7 +14,7 @@ contract YieldVaultExtendedTest is Test {
     function setUp() public {
         token = new GovToken();
         vault = new YieldVault(token);
-        
+
         token.mint(user1, 10000e18);
         token.mint(user2, 10000e18);
 
@@ -28,12 +28,29 @@ contract YieldVaultExtendedTest is Test {
     }
 
     // --- View функции ERC4626 ---
-    function test_Asset() public view { assertEq(vault.asset(), address(token)); }
-    function test_TotalAssetsZero() public view { assertEq(vault.totalAssets(), 0); }
-    function test_ConvertToShares1to1() public view { assertEq(vault.convertToShares(100e18), 100e18); }
-    function test_ConvertToAssets1to1() public view { assertEq(vault.convertToAssets(100e18), 100e18); }
-    function test_MaxDeposit() public view { assertTrue(vault.maxDeposit(user1) > 0); }
-    function test_MaxMint() public view { assertTrue(vault.maxMint(user1) > 0); }
+    function test_Asset() public view {
+        assertEq(vault.asset(), address(token));
+    }
+
+    function test_TotalAssetsZero() public view {
+        assertEq(vault.totalAssets(), 0);
+    }
+
+    function test_ConvertToShares1to1() public view {
+        assertEq(vault.convertToShares(100e18), 100e18);
+    }
+
+    function test_ConvertToAssets1to1() public view {
+        assertEq(vault.convertToAssets(100e18), 100e18);
+    }
+
+    function test_MaxDeposit() public view {
+        assertTrue(vault.maxDeposit(user1) > 0);
+    }
+
+    function test_MaxMint() public view {
+        assertTrue(vault.maxMint(user1) > 0);
+    }
 
     // --- Проверки Deposit ---
     function test_Deposit() public {
