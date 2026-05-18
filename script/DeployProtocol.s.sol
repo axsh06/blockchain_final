@@ -12,14 +12,15 @@ import {IVotes} from "openzeppelin-contracts/contracts/governance/utils/IVotes.s
 
 contract DeployProtocol is Script {
     function run() external {
-        uint256 deployerPrivateKey = vm.envOr("PRIVATE_KEY", uint256(0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80));
+        uint256 deployerPrivateKey =
+            vm.envOr("PRIVATE_KEY", uint256(0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80));
         address deployer = vm.addr(deployerPrivateKey);
 
         vm.startBroadcast(deployerPrivateKey);
 
         // 1. Деплоим токены
         GovToken govToken = new GovToken();
-        
+
         // 2. Деплоим Timelock
         address[] memory proposers = new address[](0);
         address[] memory executors = new address[](0);
@@ -34,13 +35,13 @@ contract DeployProtocol is Script {
         bytes32 adminRole = timelock.DEFAULT_ADMIN_ROLE();
 
         timelock.grantRole(proposerRole, address(governor));
-        timelock.grantRole(executorRole, address(0)); 
-        timelock.revokeRole(adminRole, deployer); 
-        
+        timelock.grantRole(executorRole, address(0));
+        timelock.revokeRole(adminRole, deployer);
+
         // 5. Деплоим AMM и Vault
-        AMMPair amm = new AMMPair(address(govToken), address(0)); 
+        AMMPair amm = new AMMPair(address(govToken), address(0));
         YieldVault vault = new YieldVault(govToken);
-        
+
         // 6. Оракул для Sepolia
         PriceOracle oracle = new PriceOracle(0x694AA1769357215DE4FAC081bf1f309aDC325306);
 
