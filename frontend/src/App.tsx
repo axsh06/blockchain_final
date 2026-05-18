@@ -4,7 +4,6 @@ import { parseEther, formatEther } from 'viem'
 import { arbitrumSepolia } from 'wagmi/chains'
 import { CONTRACT_ADDRESSES } from './contracts'
 
-// Импортируем сгенерированные ABI из твоей новой папки
 import ammPairJson from './abis/AMMPair.json'
 import yieldVaultJson from './abis/YieldVault.json'
 import protocolGovernorJson from './abis/ProtocolGovernor.json'
@@ -22,12 +21,8 @@ function App() {
 
   const isWrongNetwork = isConnected && chainId !== arbitrumSepolia.id
 
-  // Подключаем функцию отправки транзакций
   const { writeContract, isPending } = useWriteContract()
 
-  // --- ЧТЕНИЕ ДАННЫХ ИЗ БЛОКЧЕЙНА (Read Functions) ---
-  
-  // 1. Получаем баланс долей пользователя в Хранилище (Vault Shares)
   const { data: vaultShares, refetch: refetchVault } = useReadContract({
     address: CONTRACT_ADDRESSES.YIELD_VAULT,
     abi: yieldVaultJson.abi,
@@ -35,28 +30,23 @@ function App() {
     args: address ? [address] : undefined,
   })
 
-  // 2. Получаем силу голоса пользователя в DAO (Voting Power)
   const { data: votingPower } = useReadContract({
     address: CONTRACT_ADDRESSES.GOV_TOKEN,
-    abi: protocolGovernorJson.abi, // Используем стандартные методы голосования
+    abi: protocolGovernorJson.abi,
     functionName: 'getVotes',
     args: address ? [address] : undefined,
   })
 
-  // --- ОТПРАВКА ТРАНЗАКЦИЙ (Write Functions) ---
-
-  // 1. Транзакция обмена (AMM Swap)
   const handleSwap = () => {
     if (!swapAmount) return
     writeContract({
       address: CONTRACT_ADDRESSES.AMM_PAIR,
       abi: ammPairJson.abi,
-      functionName: 'swap', // Имя функции в контракте Алишера
-      args: [parseEther(swapAmount), address], // Пример аргументов: сумма и получатель
+      functionName: 'swap',
+      args: [parseEther(swapAmount), address],
     })
   }
 
-  // 2. Транзакция депозита в хранилище (Vault Deposit)
   const handleDeposit = () => {
     if (!depositAmount) return
     writeContract({
@@ -69,13 +59,12 @@ function App() {
     })
   }
 
-  // 3. Транзакция голосования в DAO (Cast Vote)
   const handleVote = (proposalId: string, support: number) => {
     writeContract({
       address: CONTRACT_ADDRESSES.PROTOCOL_GOVERNOR,
       abi: protocolGovernorJson.abi,
       functionName: 'castVote',
-      args: [BigInt(proposalId), support], // support: 0 = Против, 1 = За, 2 = Воздержался
+      args: [BigInt(proposalId), support],
     })
   }
 
@@ -83,7 +72,6 @@ function App() {
     <div className="min-h-screen flex flex-col items-center py-12 px-4">
       <div className="max-w-2xl w-full border border-gray-900 p-8 rounded-lg text-center bg-black">
         
-        {/* Шапка */}
         <div className="flex justify-between items-center mb-8 border-b border-gray-800 pb-4">
           <h1 className="text-2xl font-bold tracking-widest uppercase">DeFi Protocol</h1>
           {isConnected && (
@@ -121,7 +109,6 @@ function App() {
           </div>
         ) : (
           <div>
-            {/* Меню навигации */}
             <div className="flex justify-center space-x-4 mb-8">
               {['swap', 'vault', 'dao'].map((tab) => (
                 <button
@@ -136,10 +123,8 @@ function App() {
               ))}
             </div>
 
-            {/* Контент вкладок */}
             <div className="text-left">
               
-              {/* AMM SWAP */}
               {activeTab === 'swap' && (
                 <div className="max-w-sm mx-auto border border-gray-800 rounded-lg p-6 bg-[#050505]">
                   <h2 className="text-lg font-bold mb-4">Swap Tokens</h2>
@@ -163,7 +148,6 @@ function App() {
                 </div>
               )}
 
-              {/* YIELD VAULT */}
               {activeTab === 'vault' && (
                 <div className="max-w-sm mx-auto border border-gray-800 rounded-lg p-6 bg-[#050505]">
                   <div className="flex justify-between items-center mb-6 border-b border-gray-800 pb-4">
@@ -176,6 +160,7 @@ function App() {
                     </div>
                   </div>
                   <div className="mb-6">
+                    <label className="text-xs text-gray-400 mb-1 block">Amount to Deposit / Withdraw</label>
                     <input 
                       type="number" 
                       placeholder="0.0" 
@@ -194,7 +179,6 @@ function App() {
                 </div>
               )}
 
-              {/* DAO GOVERNANCE */}
               {activeTab === 'dao' && (
                 <div className="border border-gray-800 rounded-lg p-6 bg-[#050505]">
                   <div className="flex justify-between items-center mb-6">
