@@ -4,7 +4,6 @@ import { parseEther, formatEther } from 'viem'
 import { arbitrumSepolia } from 'wagmi/chains'
 import { CONTRACT_ADDRESSES } from './contracts'
 
-// Импортируем сгенерированные ABI из твоей новой папки
 import ammPairJson from './abis/AMMPair.json'
 import yieldVaultJson from './abis/YieldVault.json'
 import protocolGovernorJson from './abis/ProtocolGovernor.json'
@@ -20,38 +19,10 @@ function App() {
   const [swapAmount, setSwapAmount] = useState('')
   const [depositAmount, setDepositAmount] = useState('')
 
-import { useState } from "react";
-import {
-  useAccount,
-  useConnect,
-  useDisconnect,
-  useChainId,
-  useSwitchChain,
-} from "wagmi";
-import { arbitrumSepolia } from "wagmi/chains";
+  const isWrongNetwork = isConnected && chainId !== arbitrumSepolia.id
 
-function App() {
-  const { address, isConnected } = useAccount();
-  const { connectors, connect } = useConnect();
-  const { disconnect } = useDisconnect();
-  const chainId = useChainId();
-  const { switchChain } = useSwitchChain();
-
-  const [activeTab, setActiveTab] = useState("swap");
-
-  // Временные состояния для полей ввода (завтра привяжем к контрактам)
-  const [swapAmount, setSwapAmount] = useState("");
-  const [depositAmount, setDepositAmount] = useState("");
-
-
-  const isWrongNetwork = isConnected && chainId !== arbitrumSepolia.id;
-
-  // Подключаем функцию отправки транзакций
   const { writeContract, isPending } = useWriteContract()
 
-  // --- ЧТЕНИЕ ДАННЫХ ИЗ БЛОКЧЕЙНА (Read Functions) ---
-  
-  // 1. Получаем баланс долей пользователя в Хранилище (Vault Shares)
   const { data: vaultShares, refetch: refetchVault } = useReadContract({
     address: CONTRACT_ADDRESSES.YIELD_VAULT,
     abi: yieldVaultJson.abi,
@@ -59,28 +30,23 @@ function App() {
     args: address ? [address] : undefined,
   })
 
-  // 2. Получаем силу голоса пользователя в DAO (Voting Power)
   const { data: votingPower } = useReadContract({
     address: CONTRACT_ADDRESSES.GOV_TOKEN,
-    abi: protocolGovernorJson.abi, // Используем стандартные методы голосования
+    abi: protocolGovernorJson.abi,
     functionName: 'getVotes',
     args: address ? [address] : undefined,
   })
 
-  // --- ОТПРАВКА ТРАНЗАКЦИЙ (Write Functions) ---
-
-  // 1. Транзакция обмена (AMM Swap)
   const handleSwap = () => {
     if (!swapAmount) return
     writeContract({
       address: CONTRACT_ADDRESSES.AMM_PAIR,
       abi: ammPairJson.abi,
-      functionName: 'swap', // Имя функции в контракте Алишера
-      args: [parseEther(swapAmount), address], // Пример аргументов: сумма и получатель
+      functionName: 'swap',
+      args: [parseEther(swapAmount), address],
     })
   }
 
-  // 2. Транзакция депозита в хранилище (Vault Deposit)
   const handleDeposit = () => {
     if (!depositAmount) return
     writeContract({
@@ -93,13 +59,12 @@ function App() {
     })
   }
 
-  // 3. Транзакция голосования в DAO (Cast Vote)
   const handleVote = (proposalId: string, support: number) => {
     writeContract({
       address: CONTRACT_ADDRESSES.PROTOCOL_GOVERNOR,
       abi: protocolGovernorJson.abi,
       functionName: 'castVote',
-      args: [BigInt(proposalId), support], // support: 0 = Против, 1 = За, 2 = Воздержался
+      args: [BigInt(proposalId), support],
     })
   }
 
@@ -107,11 +72,8 @@ function App() {
     <div className="min-h-screen flex flex-col items-center py-12 px-4">
       <div className="max-w-2xl w-full border border-gray-900 p-8 rounded-lg text-center bg-black">
         
-        {/* Шапка */}
         <div className="flex justify-between items-center mb-8 border-b border-gray-800 pb-4">
-          <h1 className="text-2xl font-bold tracking-widest uppercase">
-            DeFi Protocol
-          </h1>
+          <h1 className="text-2xl font-bold tracking-widest uppercase">DeFi Protocol</h1>
           {isConnected && (
             <button
               onClick={() => disconnect()}
@@ -124,9 +86,7 @@ function App() {
 
         {!isConnected ? (
           <div className="max-w-sm mx-auto">
-            <p className="text-gray-400 mb-6">
-              Connect your wallet to access the decentralized protocol.
-            </p>
+            <p className="text-gray-400 mb-6">Connect your wallet to access the decentralized protocol.</p>
             {connectors.map((connector) => (
               <button
                 key={connector.uid}
@@ -149,20 +109,13 @@ function App() {
           </div>
         ) : (
           <div>
-            {/* Меню навигации */}
             <div className="flex justify-center space-x-4 mb-8">
-              {["swap", "vault", "dao"].map((tab) => (
+              {['swap', 'vault', 'dao'].map((tab) => (
                 <button
                   key={tab}
                   onClick={() => setActiveTab(tab)}
                   className={`px-6 py-2 rounded font-bold uppercase tracking-wide text-sm transition-colors ${
-
                     activeTab === tab ? 'bg-white text-black' : 'border border-gray-800 text-gray-400 hover:border-gray-600'
-
-                    activeTab === tab
-                      ? "bg-white text-black"
-                      : "border border-gray-800 text-gray-400 hover:border-gray-600"
-
                   }`}
                 >
                   {tab}
@@ -170,11 +123,8 @@ function App() {
               ))}
             </div>
 
-            {/* Контент вкладок */}
             <div className="text-left">
-
               
-              {/* AMM SWAP */}
               {activeTab === 'swap' && (
                 <div className="max-w-sm mx-auto border border-gray-800 rounded-lg p-6 bg-[#050505]">
                   <h2 className="text-lg font-bold mb-4">Swap Tokens</h2>
@@ -183,31 +133,11 @@ function App() {
                     <input 
                       type="number" 
                       placeholder="0.0" 
-
-              {/* --- ВКЛАДКА 1: AMM SWAP --- */}
-              {activeTab === "swap" && (
-                <div className="max-w-sm mx-auto border border-gray-800 rounded-lg p-6 bg-[#050505]">
-                  <div className="flex justify-between items-center mb-4">
-                    <h2 className="text-lg font-bold">Swap Tokens</h2>
-                    <span className="text-xs text-gray-500">
-                      Slippage: 0.5%
-                    </span>
-                  </div>
-
-                  <div className="mb-2">
-                    <label className="text-xs text-gray-400 mb-1 block">
-                      You Pay (Token A)
-                    </label>
-                    <input
-                      type="number"
-                      placeholder="0.0"
-
                       value={swapAmount}
                       onChange={(e) => setSwapAmount(e.target.value)}
                       className="w-full bg-black border border-gray-800 rounded p-3 text-white outline-none focus:border-gray-500"
                     />
                   </div>
-
                   <button 
                     onClick={handleSwap}
                     disabled={isPending}
@@ -218,39 +148,7 @@ function App() {
                 </div>
               )}
 
-              {/* YIELD VAULT */}
               {activeTab === 'vault' && (
-
-
-                  <div className="flex justify-center my-2 text-gray-600">
-                    ↓
-                  </div>
-
-                  <div className="mb-6">
-                    <label className="text-xs text-gray-400 mb-1 block">
-                      You Receive (Token B)
-                    </label>
-                    <input
-                      type="number"
-                      placeholder="0.0"
-                      disabled
-                      className="w-full bg-black border border-gray-800 rounded p-3 text-gray-500 outline-none cursor-not-allowed"
-                    />
-                  </div>
-
-                  {/* ЗАВТРА: Привяжем сюда функцию writeContract для обмена */}
-                  <button className="w-full bg-white text-black font-bold py-3 rounded hover:bg-gray-200 transition-colors">
-                    Execute Swap
-                  </button>
-                  <p className="text-center text-xs text-gray-600 mt-3">
-                    Pool Fee: 0.3%
-                  </p>
-                </div>
-              )}
-
-              {/* --- ВКЛАДКА 2: YIELD VAULT --- */}
-              {activeTab === "vault" && (
-
                 <div className="max-w-sm mx-auto border border-gray-800 rounded-lg p-6 bg-[#050505]">
                   <div className="flex justify-between items-center mb-6 border-b border-gray-800 pb-4">
                     <h2 className="text-lg font-bold">ERC-4626 Vault</h2>
@@ -262,18 +160,10 @@ function App() {
                     </div>
                   </div>
                   <div className="mb-6">
-
+                    <label className="text-xs text-gray-400 mb-1 block">Amount to Deposit / Withdraw</label>
                     <input 
                       type="number" 
                       placeholder="0.0" 
-
-                    <label className="text-xs text-gray-400 mb-1 block">
-                      Amount to Deposit / Withdraw
-                    </label>
-                    <input
-                      type="number"
-                      placeholder="0.0"
-
                       value={depositAmount}
                       onChange={(e) => setDepositAmount(e.target.value)}
                       className="w-full bg-black border border-gray-800 rounded p-3 text-white outline-none focus:border-gray-500"
@@ -289,49 +179,23 @@ function App() {
                 </div>
               )}
 
-
-              {/* DAO GOVERNANCE */}
               {activeTab === 'dao' && (
-
-              {/* --- ВКЛАДКА 3: DAO GOVERNANCE --- */}
-              {activeTab === "dao" && (
-
                 <div className="border border-gray-800 rounded-lg p-6 bg-[#050505]">
                   <div className="flex justify-between items-center mb-6">
                     <h2 className="text-lg font-bold">Active Proposals</h2>
                     <div className="bg-gray-900 border border-gray-800 px-3 py-1 rounded text-sm">
-
                       Voting Power: <span className="font-bold text-white">
                         {votingPower ? parseFloat(formatEther(votingPower as bigint)).toFixed(2) : '0.00'} GOV
                       </span>
-
-                      Voting Power:{" "}
-                      <span className="font-bold text-white">0.00 GOV</span>
-
                     </div>
                   </div>
 
                   <div className="border border-gray-800 rounded p-4 mb-4">
                     <div className="flex justify-between items-start mb-2">
-
                       <h3 className="font-bold text-white">Proposal #1: Change Pool Fee Parameter</h3>
                       <span className="bg-white text-black text-xs font-bold px-2 py-1 rounded uppercase">Active</span>
                     </div>
                     <p className="text-sm text-gray-400 mb-4">This proposal executes parameter updates via Timelock Controller.</p>
-
-                      <h3 className="font-bold text-white">
-                        Proposal #1: Change Pool Fee to 0.5%
-                      </h3>
-                      <span className="bg-white text-black text-xs font-bold px-2 py-1 rounded uppercase tracking-wide">
-                        Active
-                      </span>
-                    </div>
-                    <p className="text-sm text-gray-400 mb-4">
-                      This proposal updates the AMM pool fee parameter via the
-                      Timelock controller.
-                    </p>
-
-
                     <div className="flex space-x-2">
                       <button onClick={() => handleVote('1', 1)} className="flex-1 border border-gray-700 hover:border-white text-white text-sm py-2 rounded">
                         Vote FOR
@@ -341,23 +205,15 @@ function App() {
                       </button>
                     </div>
                   </div>
-
-
-
-                  <div className="text-center mt-6">
-                    <p className="text-xs text-gray-600">
-                      More proposals will appear here via The Graph indexer.
-                    </p>
-                  </div>
-
                 </div>
               )}
+
             </div>
           </div>
         )}
       </div>
     </div>
-  );
+  )
 }
 
-export default App;
+export default App
