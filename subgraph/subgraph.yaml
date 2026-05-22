@@ -1,0 +1,46 @@
+specVersion: 0.0.5
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum
+    name: AMMPair
+    network: arbitrum-sepolia
+    source:
+      address: "0xd85c4cf4be8841c26d92bb026c2e3f39c7216578"
+      abi: AMMPair
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - Swap
+      abis:
+        - name: AMMPair
+          file: ../frontend/src/abis/AMMPair.json
+      eventHandlers:
+        - event: Swap(indexed address,uint256,uint256)
+          handler: handleSwap
+      file: ./src/mapping.ts
+
+  - kind: ethereum
+    name: ProtocolGovernor
+    network: arbitrum-sepolia
+    source:
+      address: "0xc872b9d674a33207de11794f32e66955a4517296"
+      abi: ProtocolGovernor
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - ProposalCreated
+        - VoteCast
+      abis:
+        - name: ProtocolGovernor
+          file: ../frontend/src/abis/ProtocolGovernor.json
+      eventHandlers:
+        - event: ProposalCreated(uint256,address,address[],uint256[],string[],bytes[],uint256,uint256,string)
+          handler: handleProposalCreated
+        - event: VoteCast(indexed address,uint256,uint8,uint256,string)
+          handler: handleVoteCast
+      file: ./src/mapping.ts

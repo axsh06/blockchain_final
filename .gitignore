@@ -12,3 +12,14 @@ docs/
 
 # Dotenv file
 .env
+
+# Node.js and Frontend
+node_modules/
+dist/
+dist-ssr/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# macOS
+.DS_Store

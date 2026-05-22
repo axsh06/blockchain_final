@@ -15,11 +15,25 @@ contract GovTokenTest is Test {
     }
 
     // --- Базовые проверки ERC20 ---
-    function test_Name() public view { assertEq(token.name(), "DeFi Super Token"); }
-    function test_Symbol() public view { assertEq(token.symbol(), "DST"); }
-    function test_TotalSupply() public view { assertEq(token.totalSupply(), 1000e18); }
-    function test_BalanceOf() public view { assertEq(token.balanceOf(user1), 1000e18); }
-    function test_BalanceOfZero() public view { assertEq(token.balanceOf(user2), 0); }
+    function test_Name() public view {
+        assertEq(token.name(), "DeFi Super Token");
+    }
+
+    function test_Symbol() public view {
+        assertEq(token.symbol(), "DST");
+    }
+
+    function test_TotalSupply() public view {
+        assertEq(token.totalSupply(), 1000e18);
+    }
+
+    function test_BalanceOf() public view {
+        assertEq(token.balanceOf(user1), 1000e18);
+    }
+
+    function test_BalanceOfZero() public view {
+        assertEq(token.balanceOf(user2), 0);
+    }
 
     // --- Проверки переводов (Transfers) ---
     function test_Transfer() public {

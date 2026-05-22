@@ -8,7 +8,10 @@ import {ERC20} from "openzeppelin-contracts/contracts/token/ERC20/ERC20.sol";
 // Создаем тестовый токен
 contract MockToken is ERC20 {
     constructor(string memory name, string memory symbol) ERC20(name, symbol) {}
-    function mint(address to, uint256 amount) public { _mint(to, amount); }
+
+    function mint(address to, uint256 amount) public {
+        _mint(to, amount);
+    }
 }
 
 contract AMMPairTest is Test {
@@ -23,7 +26,7 @@ contract AMMPairTest is Test {
         token0 = new MockToken("Token0", "TK0");
         token1 = new MockToken("Token1", "TK1");
         invalidToken = new MockToken("Invalid", "INV");
-        
+
         pair = new AMMPair(address(token0), address(token1));
 
         // Даем юзеру токены
@@ -34,7 +37,7 @@ contract AMMPairTest is Test {
         vm.startPrank(user);
         token0.approve(address(pair), type(uint256).max);
         token1.approve(address(pair), type(uint256).max);
-        
+
         // Начальная ликвидность
         pair.addLiquidity(100000e18, 100000e18);
         vm.stopPrank();
@@ -80,7 +83,7 @@ contract AMMPairTest is Test {
         vm.startPrank(user);
         vm.expectRevert("Slippage protection triggered");
         // Требуем нереально большую сумму на выход (minAmountOut = 1 000 000)
-        pair.swap(address(token0), 100e18, 1000000e18); 
+        pair.swap(address(token0), 100e18, 1000000e18);
         vm.stopPrank();
     }
 

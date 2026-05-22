@@ -72,8 +72,15 @@ npm run dev
 
 The protocol's events are indexed using a custom Subgraph. Below are the 5 core queries used to extract on-chain data into our frontend:
 
+<<<<<<< HEAD
 **1. Fetch the 5 most recent AMM swaps**
 
+=======
+
+**1. Fetch the 5 most recent AMM swaps**
+
+
+>>>>>>> 3fef5198c658b6cc242e94b523bfb82c6045c586
 ```graphql
 query GetRecentSwaps {
   swaps(first: 5, orderBy: timestamp, orderDirection: desc) {
@@ -124,6 +131,7 @@ query GetWhaleVotes {
 ```
 
 **5. View the complete voting history for a specific proposal**
+<<<<<<< HEAD
 
 ```graphql
 query GetVotesForProposal($proposal: BigInt!) {
@@ -135,3 +143,15 @@ query GetVotesForProposal($proposal: BigInt!) {
 }
 
 ```
+=======
+
+```graphql
+query GetVotesForProposal($proposal: BigInt!) {
+  voteCasts(where: { proposalId: $proposal }) {
+    voter
+    support
+    weight
+  }
+}
+
+>>>>>>> 3fef5198c658b6cc242e94b523bfb82c6045c586

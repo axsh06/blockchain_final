@@ -21,7 +21,7 @@ contract PriceOracleTest is Test {
         vm.expectRevert();
         oracle.getLatestPrice();
     }
-    
+
     function test_InitializationWithZeroAddress() public {
         PriceOracle zeroOracle = new PriceOracle(address(0));
         assertEq(address(zeroOracle.priceFeed()), address(0));
